@@ -1,18 +1,20 @@
-import { Searchbar, ImageGallery, Modal, Loader } from 'components';
+import { Searchbar, ImageGallery, Modal, Loader, Button } from 'components';
 
 import { Component } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 export class App extends Component {
   state = {
-    query: null,
+    status: 'idle',
     collection: [],
+    query: null,
+    page: 1,
+
     isModalOpen: false,
     currentImg: {
       imgUrl: '',
       altText: '',
     },
-    status: 'idle',
   };
 
   BASE_URL = 'https://pixabay.com/api/';
@@ -21,7 +23,6 @@ export class App extends Component {
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: 'true',
-    page: 1,
     per_page: 12,
   });
 
@@ -29,17 +30,25 @@ export class App extends Component {
     const { BASE_URL, params } = this;
     const prevQuery = prevState.query;
     const nextQuery = this.state.query;
+    const prevPage = prevState.page;
+    const nextPage = this.state.page;
 
-    if (prevQuery !== nextQuery) {
+    if (prevQuery !== nextQuery || prevPage !== nextPage) {
       this.setState({ status: 'pending' });
 
-      fetch(`${BASE_URL}?${params}&q=${nextQuery}`)
+      fetch(`${BASE_URL}?${params}&q=${nextQuery}&page=${this.state.page}`)
         .then(res => res.json())
         .then(data => {
           if (data.hits.length > 0) {
-            this.setState({ status: 'resolve', collection: data.hits });
+            this.setState(prevState => ({
+              collection: [...prevState.collection, ...data.hits],
+              status: 'resolve',
+            }));
+            // this.setState({ status: 'resolve', collection: data.hits });
             return;
           }
+
+          this.setState({ status: 'idle' });
 
           return Promise.reject(
             new Error(`No pictures requested ${nextQuery}`)
@@ -60,11 +69,18 @@ export class App extends Component {
   };
 
   getQuery = value => {
-    this.setState({ query: value });
+    this.setState({ query: value, page: 1, collection: [] });
+  };
+
+  handleLoadMore = () => {
+    this.setState(prev => ({
+      page: prev.page + 1,
+    }));
+    console.log(this.state);
   };
 
   render() {
-    const { getQuery, toggleModal } = this;
+    const { getQuery, toggleModal, handleLoadMore } = this;
     const { collection, query, isModalOpen, currentImg, status } = this.state;
 
     return (
@@ -74,11 +90,14 @@ export class App extends Component {
         {status === 'pending' && <Loader />}
 
         {status === 'resolve' && collection && (
-          <ImageGallery
-            data={collection}
-            name={query}
-            openModal={toggleModal}
-          />
+          <>
+            <ImageGallery
+              data={collection}
+              name={query}
+              openModal={toggleModal}
+            />
+            <Button onClick={handleLoadMore} />
+          </>
         )}
 
         {isModalOpen && <Modal onShow={toggleModal} img={currentImg} />}
