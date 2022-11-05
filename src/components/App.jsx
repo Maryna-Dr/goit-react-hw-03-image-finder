@@ -3,9 +3,15 @@ import { Searchbar, ImageGallery, Modal, Loader, Button } from 'components';
 import { Component } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVE: 'resolve',
+};
+
 export class App extends Component {
   state = {
-    status: 'idle',
+    status: Status.IDLE,
     collection: [],
     query: null,
     page: 1,
@@ -34,7 +40,7 @@ export class App extends Component {
     const nextPage = this.state.page;
 
     if (prevQuery !== nextQuery || prevPage !== nextPage) {
-      this.setState({ status: 'pending' });
+      this.setState({ status: Status.PENDING });
 
       fetch(`${BASE_URL}?${params}&q=${nextQuery}&page=${this.state.page}`)
         .then(res => res.json())
@@ -42,12 +48,12 @@ export class App extends Component {
           if (data.hits.length > 0) {
             this.setState(prevState => ({
               collection: [...prevState.collection, ...data.hits],
-              status: 'resolve',
+              status: Status.RESOLVE,
             }));
             return;
           }
 
-          this.setState({ status: 'idle' });
+          this.setState({ status: Status.IDLE });
 
           return Promise.reject(
             new Error(`No pictures requested ${nextQuery}`)
@@ -71,9 +77,11 @@ export class App extends Component {
     this.setState({ query: value, page: 1, collection: [] });
   };
 
-  handleLoadMore = e => {
+  handleLoadMore = () => {
+    this.setState({ status: Status.PENDING });
     this.setState(prev => ({
       page: prev.page + 1,
+      status: Status.RESOLVE,
     }));
   };
 
@@ -85,18 +93,12 @@ export class App extends Component {
       <>
         <Searchbar onSubmit={getQuery} />
 
-        {status === 'pending' && <Loader />}
-
-        {status === 'resolve' && collection && (
-          <>
-            <ImageGallery
-              data={collection}
-              name={query}
-              openModal={toggleModal}
-            />
-            <Button onClick={handleLoadMore} />
-          </>
+        <ImageGallery data={collection} name={query} openModal={toggleModal} />
+        {collection.length !== 0 && status === Status.RESOLVE && (
+          <Button onClick={handleLoadMore} />
         )}
+
+        {status === Status.PENDING && <Loader />}
 
         {isModalOpen && <Modal onShow={toggleModal} img={currentImg} />}
       </>

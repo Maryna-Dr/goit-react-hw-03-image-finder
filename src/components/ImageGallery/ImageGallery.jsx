@@ -28,6 +28,6 @@ ImageGallery.propTypes = {
       largeImageURL: PropTypes.string.isRequired,
     })
   ),
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   openModal: PropTypes.func.isRequired,
 };

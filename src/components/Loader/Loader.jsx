@@ -11,7 +11,6 @@ export default function Loader() {
         display: 'block',
         marginLeft: 'auto',
         marginRight: 'auto',
-        marginTop: '200',
       }}
       colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']}
     />
