@@ -1,3 +1,5 @@
+// import PropTypes from 'prop-types';
+
 import css from './ImageGalleryItem.module.css';
 
 export default function ImageGalleryItem({

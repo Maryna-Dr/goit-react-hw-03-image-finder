@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import css from './Modal.module.css';
 
@@ -30,5 +31,13 @@ export class Modal extends Component {
     );
   }
 }
+
+Modal.propTypes = {
+  onShow: PropTypes.func.isRequired,
+  img: PropTypes.shape({
+    imgUrl: PropTypes.string.isRequired,
+    altText: PropTypes.string.isRequired,
+  }),
+};
 
 export default Modal;

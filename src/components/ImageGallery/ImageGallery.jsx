@@ -1,4 +1,4 @@
-// import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { ImageGalleryItem } from 'components';
 
@@ -20,38 +20,14 @@ export default function ImageGallery({ data, name, openModal }) {
   );
 }
 
-// class ImageGallery extends Component {
-//   state = {
-//     isModalOpen: false,
-//   };
-
-//   toggleModal = () => {
-//     this.setState(({ isModalOpen }) => ({
-//       isModalOpen: !isModalOpen,
-//     }));
-//   };
-
-//   render() {
-//     const { data, name } = this.props;
-//     return (
-//       <ul className={css.gallery}>
-//         {data.map(({ id, webformatURL, largeImageURL }, idx) => (
-//           <>
-//             <ImageGalleryItem
-//               key={id}
-//               smallImg={webformatURL}
-//               id={id}
-//               name={name}
-//               showModal={this.toggleModal}
-//             />
-//             {this.state.isModalOpen && <Modal key={idx} img={largeImageURL} />}
-//           </>
-//         ))}
-//       </ul>
-//     );
-//   }
-// }
-
-// export default ImageGallery;
-
-// largeImg={largeImageURL}
+ImageGallery.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+    })
+  ),
+  name: PropTypes.string.isRequired,
+  openModal: PropTypes.func.isRequired,
+};

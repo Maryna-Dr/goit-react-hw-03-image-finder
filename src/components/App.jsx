@@ -44,7 +44,6 @@ export class App extends Component {
               collection: [...prevState.collection, ...data.hits],
               status: 'resolve',
             }));
-            // this.setState({ status: 'resolve', collection: data.hits });
             return;
           }
 
@@ -72,11 +71,10 @@ export class App extends Component {
     this.setState({ query: value, page: 1, collection: [] });
   };
 
-  handleLoadMore = () => {
+  handleLoadMore = e => {
     this.setState(prev => ({
       page: prev.page + 1,
     }));
-    console.log(this.state);
   };
 
   render() {
